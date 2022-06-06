@@ -1,4 +1,4 @@
-from app import app
+from uni_devops_project_app import app
 from flask import Flask, request, jsonify, render_template
 
 
