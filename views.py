@@ -1,42 +1,57 @@
 from uni_devops_project_app import app
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, jsonify, render_template, redirect, url_for
+
+import re
+
+## static templates for local use
+RETURN_TO_MAIN = """
+<form action = "http://localhost:10000">
+    <input type="submit" value="To Start">
+</form>
+"""
+
+def fizzbuzz(fizbuz: int = 16) -> str:
+    start = """\t<div>\n\t\t<h2>The FizzBuzz...</h2>
+        """
+    end = """
+        </div>
+        """
+
+    v = ""
+    for fb in range(fizbuz):
+        if fb % 3 == 0 and fb % 5 == 0:
+            v += "\n\t\t<p>fizzbuzz</p>"
+            continue
+        elif fb % 3 == 0:
+            v += "\n\t\t<p>fizz</p>"
+            continue
+        elif fb % 5 == 0:
+            v += "\n\t\t<p>buzz</p>"
+            continue
+
+        v += f"\n\t\t<p>\n{fb}</p>"
+
+    return start + v + end
 
 
-@app.route('/getmsg/', methods=['GET'])
-def respond():
+@app.route('/fizzbuzz', methods=['POST'])
+def post_fizzbuzz():
+    if request.method == 'POST':
 
-    name = request.args.get("name", None)
+        try:
+            number = int(re.search(r'\d+', request.form['fizzbuzz']).group())
+        except :
+            return render_template(
+                'index.html',
+                message="You really should have entered at least one number in the string. Try again..."
+            )
 
-    response = {}
+        s = fizzbuzz(number)
 
-    if not name:
-        response["ERROR"] = "No name found. Please send a name."
-
-    elif str(name).isdigit():
-        response["ERROR"] = "The name can't be numeric. Please send a string."
-    else:
-        response["MESSAGE"] = f"Welcome {name} to our awesome API!"
-
-    return jsonify(response)
-
-
-@app.route('/post/', methods=['POST'])
-def post_something():
-    param = request.form.get('name')
-    # You can add the test cases you made in the previous function, but in our case here you are just testing the POST functionality
-    if param:
-        return jsonify({
-            "Message": f"Welcome {name} to our awesome API!",
-
-            "METHOD": "POST"
-        })
-    else:
-        return jsonify({
-            "ERROR": "No name found. Please send a name."
-        })
+        return s + RETURN_TO_MAIN
 
 
 @app.route('/')
 def index():
 
-    return render_template('index.html')
+    return render_template('index.html', message='')
