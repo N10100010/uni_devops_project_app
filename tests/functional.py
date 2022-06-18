@@ -1,4 +1,5 @@
 
-def test_index_page():
+
+def test_application_here():
     # add tests here
     print('test succeeded')
